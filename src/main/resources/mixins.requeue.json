@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.7",
+  "package": "com.bytespacegames.requeue.mixins",
+  "refmap": "mixins.requeue.refmap.json",
+  "compatibilityLevel": "JAVA_8",
+  "client": [
+    "MixinMinecraft"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

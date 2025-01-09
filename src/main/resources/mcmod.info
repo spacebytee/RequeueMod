@@ -1,0 +1,16 @@
+[
+{
+  "modid": "requeuemod",
+  "name": "RequeueMod",
+  "description": "req",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["spacebyte"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
