@@ -17,12 +17,16 @@ public class TickListener implements Mod.EventHandler {
         handleLocraw();
         handleAuto();
     }
+    public void resetTimer() {
+        timeSinceInLobby = Long.MAX_VALUE;
+    }
     public void handleAuto() {
-        if (!RequeueMod.instance.isAuto()) return;
         RequeueMod.instance.getRequeue().onTick();
     }
     public void handleLocraw() {
         if (!LocationManager.instance.isAwaitingLocraw()) return;
+        if (Minecraft.getMinecraft().theWorld == null) return;
+        if (Minecraft.getMinecraft().thePlayer == null) return;
         if (Minecraft.getMinecraft().currentScreen instanceof GuiDownloadTerrain) return;
         // set timer
         long epoch = System.currentTimeMillis();

@@ -2,10 +2,12 @@ package com.bytespacegames.requeue.util;
 
 public class GameUtil {
     public static String getGameID(String type, String mode) {
+        if (mode == null) return null;
         if ("normal".equals(mode) && !"GINGERBREAD".equals(type) && !"MCGO".equals(type))
             return type;
 
         switch (type) {
+            case "MURDER_MYSTERY": return mode;
             case "SKYBLOCK": return "skyblock";
             case "TNTGAMES": return "tnt_" + mode;
             case "SPEED_UHC": return "speed_" + mode;
@@ -19,6 +21,7 @@ public class GameUtil {
             case "WALLS3": return "mw_" + mode;
             case "BATTLEGROUND":  return "warlords_" + mode;
             case "SUPER_SMASH": return "super_smash_" + mode;
+            case "WOOL_GAMES": return "wool_" + mode;
             case "ARCADE":
                 if ("DEFENDER".equals(mode)) {
                     return "arcade_creeper_defense";

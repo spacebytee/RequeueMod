@@ -2,6 +2,8 @@ package com.bytespacegames.requeue.mixins;
 
 import com.bytespacegames.requeue.LocationManager;
 import com.bytespacegames.requeue.RequeueMod;
+import com.bytespacegames.requeue.auto.IAutoRequeue;
+import com.bytespacegames.requeue.auto.WhoRequeue;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,5 +20,8 @@ public class MixinMinecraft {
     @Inject(method="loadWorld", at=@At("TAIL"))
     public void mixin$loadWorld(WorldClient p_71403_1_, CallbackInfo ci) {
         LocationManager.instance.invalidateLocraw();
+        RequeueMod.instance.getTickListener().resetTimer();
+        IAutoRequeue r = RequeueMod.instance.getRequeue();
+        r.requeueCleanup();
     }
 }

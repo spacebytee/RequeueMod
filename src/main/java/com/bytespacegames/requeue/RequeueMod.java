@@ -3,6 +3,7 @@ package com.bytespacegames.requeue;
 import com.bytespacegames.requeue.auto.IAutoRequeue;
 import com.bytespacegames.requeue.auto.WhoRequeue;
 import com.bytespacegames.requeue.commands.Requeue;
+import com.bytespacegames.requeue.commands.RequeuePartyList;
 import com.bytespacegames.requeue.listeners.ChatListener;
 import com.bytespacegames.requeue.listeners.TickListener;
 import net.minecraft.client.Minecraft;
@@ -20,11 +21,21 @@ public class RequeueMod {
     public static RequeueMod instance;
 
     private ChatListener chatHandler;
+    private TickListener tickListener;
+
     private Minecraft mc;
     private boolean isAuto = true;
+    private boolean careAboutClient = true;
+    private boolean safeGuardManual = true;
     private IAutoRequeue req = new WhoRequeue();
     public boolean isAuto() {
         return isAuto;
+    }
+    public boolean caresAboutClient() {
+        return careAboutClient;
+    }
+    public boolean safeguardManualRequeues() {
+        return safeGuardManual;
     }
     public IAutoRequeue getRequeue() {
         return req;
@@ -34,13 +45,18 @@ public class RequeueMod {
     public void init(FMLInitializationEvent event) {
         instance = this;
         mc = Minecraft.getMinecraft();
-        MinecraftForge.EVENT_BUS.register(new ChatListener());
-        MinecraftForge.EVENT_BUS.register(new TickListener());
+        MinecraftForge.EVENT_BUS.register(chatHandler = new ChatListener());
+        MinecraftForge.EVENT_BUS.register(tickListener = new TickListener());
         ClientCommandHandler.instance.registerCommand(new Requeue());
+        ClientCommandHandler.instance.registerCommand(new RequeuePartyList());
         new LocationManager();
+        new PartyManager();
     }
 
     public ChatListener getChatHandler() {
         return chatHandler;
+    }
+    public TickListener getTickListener() {
+        return tickListener;
     }
 }

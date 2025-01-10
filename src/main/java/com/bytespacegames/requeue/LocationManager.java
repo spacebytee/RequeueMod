@@ -14,9 +14,7 @@ public class LocationManager {
     public void invalidateLocraw() {
         locraw = null;
         awaitingLocraw = true;
-        if (RequeueMod.instance.getRequeue() instanceof WhoRequeue) {
-            ((WhoRequeue)RequeueMod.instance.getRequeue()).invalidateNames();
-        }
+        RequeueMod.instance.getRequeue().requeueCleanup();
     }
     public boolean isAwaitingLocraw() {
         return awaitingLocraw;
