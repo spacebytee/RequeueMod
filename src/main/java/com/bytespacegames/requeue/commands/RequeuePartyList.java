@@ -21,7 +21,7 @@ public class RequeuePartyList extends CommandBase {
     }
 
     public void list() {
-        String players = RequeueMod.instance.caresAboutClient() ? Minecraft.getMinecraft().thePlayer.getName() : "";
+        String players = RequeueMod.instance.getSettingByName("clientplayer").isEnabled() ? Minecraft.getMinecraft().thePlayer.getName() : "";
         // string builders are for nerds.
         for (String player : PartyManager.instance.getParty()) {
             players += ", " + player;

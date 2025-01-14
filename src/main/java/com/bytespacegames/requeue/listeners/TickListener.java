@@ -29,6 +29,7 @@ public class TickListener implements Mod.EventHandler {
     }
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event) {
+        if (!RequeueMod.instance.modEnabled()) return;
         handleKickOffline();
         handleLocraw();
         handleAuto();
@@ -55,6 +56,7 @@ public class TickListener implements Mod.EventHandler {
     public void handleAuto() {
         if (LocationManager.instance == null) return;
         if (LocationManager.instance.getType() == null) return;
+        if (LocationManager.instance.getMode() == null) return;
         if (LocationManager.instance.getType().equalsIgnoreCase("PIT")) return;
         if (LocationManager.instance.getType().equalsIgnoreCase("SKYBLOCK")) return;
         if (LocationManager.instance.getType().equalsIgnoreCase("REPLAY")) return;
@@ -68,7 +70,7 @@ public class TickListener implements Mod.EventHandler {
             RequeueMod.instance.setRequeue(new WhoRequeue());
         }
         // handle requeueing prompted by a game end detected in ChatListener
-        if (endRequeueTriggered && endRequeueTimer.hasTimeElapsed(1000,false)) {
+        if (endRequeueTriggered && endRequeueTimer.hasTimeElapsed(500,false)) {
             endRequeueTriggered = false;
             requeue();
             return;

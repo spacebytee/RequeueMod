@@ -61,7 +61,7 @@ public class WhoRequeue implements IAutoRequeue {
                 return false;
             }
         }
-        if (RequeueMod.instance.caresAboutClient()) {
+        if (RequeueMod.instance.getSettingByName("clientplayer").isEnabled()) {
             return !whoNames.contains(Minecraft.getMinecraft().thePlayer.getName().trim());
         }
         return true;
@@ -78,7 +78,7 @@ public class WhoRequeue implements IAutoRequeue {
         if (LocationManager.instance.getType() == null) return;
         handleSendWho();
         if (whoNames.isEmpty()) return;
-        if (!RequeueMod.instance.isAuto()) return;
+        if (!RequeueMod.instance.getSettingByName("auto").isEnabled()) return;
         if (canRequeue() && requeueTimer.hasTimeElapsed(10000,true)) {
             String s = GameUtil.getGameID(LocationManager.instance.getType(), LocationManager.instance.getMode());
             if (s == null) {

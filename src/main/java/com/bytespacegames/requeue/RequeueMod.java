@@ -6,46 +6,51 @@ import com.bytespacegames.requeue.commands.Requeue;
 import com.bytespacegames.requeue.commands.RequeuePartyList;
 import com.bytespacegames.requeue.listeners.ChatListener;
 import com.bytespacegames.requeue.listeners.TickListener;
+import com.bytespacegames.requeue.settings.BooleanSetting;
+import com.bytespacegames.requeue.settings.Setting;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Mod(modid = RequeueMod.MODID, version = RequeueMod.VERSION)
 public class RequeueMod {
     public static final String MODID = "requeuemod";
-    public static final String VERSION = "1.0.1";
+    public static final String VERSION = "1.0.2";
     public static final String MOD_PREFIX = "§cspace's requeue";
     public static RequeueMod instance;
 
     private ChatListener chatHandler;
     private TickListener tickListener;
-
-    private boolean isAuto = false;
-    private boolean careAboutClient = true;
-    private boolean safeGuardManual = true;
-    private boolean kickOffline = true;
-    private boolean requeueOnWin = false;
     private IAutoRequeue req = new WhoRequeue();
-    public boolean isAuto() {
-        return isAuto;
+
+    private List<Setting> settings = new ArrayList<Setting>();
+
+    public List<Setting> getSettings() {
+        return settings;
     }
-    public boolean caresAboutClient() {
-        return careAboutClient;
+
+    public void registerSettings() {
+        settings.add(new BooleanSetting("auto", false));
+        settings.add(new BooleanSetting("safeguard", true));
+        settings.add(new BooleanSetting("kickoffline", true));
+        settings.add(new BooleanSetting("clientplayer", true));
+        settings.add(new BooleanSetting("requeueonwin", false));
+        settings.add(new BooleanSetting("hypixelonly", true));
     }
-    public boolean safeguardManualRequeues() {
-        return safeGuardManual;
+    public Setting getSettingByName(String name) {
+        for (Setting s : settings) {
+            if (s.getName().trim().equalsIgnoreCase(name.trim())) {
+                return s;
+            }
+        }
+        return null;
     }
-    public boolean kickOffline() {
-        return kickOffline;
-    }
-    public boolean requeueOnWin() { return requeueOnWin; }
-    public boolean toggleAuto() { isAuto = !isAuto; return isAuto; }
-    public boolean toggleClientPlayer() { careAboutClient = !careAboutClient; return careAboutClient; }
-    public boolean toggleSafeGuardManual() { safeGuardManual = !safeGuardManual; return safeGuardManual; }
-    public boolean toggleKickOffline() { kickOffline = !kickOffline; return kickOffline; }
-    public boolean toggleRequeueOnWin() { requeueOnWin = !requeueOnWin; return requeueOnWin; }
+
     public IAutoRequeue getRequeue() {
         return req;
     }
@@ -58,10 +63,18 @@ public class RequeueMod {
     public void setRequeue(IAutoRequeue rq) {
         this.req=rq;
     }
+    public boolean modEnabled() {
+        if (getSettingByName("hypixelonly").isEnabled()) {
+            String ip = Minecraft.getMinecraft().getCurrentServerData().serverIP.toLowerCase();
+            return ip.contains("hypixel.net") || ip.contains("hypixel.io");
+        }
+        return true;
+    }
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
         instance = this;
+        registerSettings();
         ConfigManager.loadSettings();
         MinecraftForge.EVENT_BUS.register(chatHandler = new ChatListener());
         MinecraftForge.EVENT_BUS.register(tickListener = new TickListener());

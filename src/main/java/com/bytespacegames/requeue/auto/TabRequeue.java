@@ -22,7 +22,7 @@ public class TabRequeue implements IAutoRequeue{
         if (Minecraft.getMinecraft().theWorld == null) return;
         if (Minecraft.getMinecraft().currentScreen != null && Minecraft.getMinecraft().currentScreen instanceof GuiDownloadTerrain) return;
         if (LocationManager.instance.getType() == null) return;
-        if (!RequeueMod.instance.isAuto()) return;
+        if (!RequeueMod.instance.getSettingByName("auto").isEnabled()) return;
         if (canRequeue() && requeueTimer.hasTimeElapsed(10000,true)) {
             String s = GameUtil.getGameID(LocationManager.instance.getType(), LocationManager.instance.getMode());
             if (s == null) {

@@ -3,6 +3,8 @@ package com.bytespacegames.requeue.commands;
 import com.bytespacegames.requeue.ConfigManager;
 import com.bytespacegames.requeue.LocationManager;
 import com.bytespacegames.requeue.RequeueMod;
+import com.bytespacegames.requeue.settings.BooleanSetting;
+import com.bytespacegames.requeue.settings.Setting;
 import com.bytespacegames.requeue.util.ChatUtil;
 import com.bytespacegames.requeue.util.GameUtil;
 import net.minecraft.client.Minecraft;
@@ -23,31 +25,18 @@ public class Requeue extends CommandBase {
     }
     public void handleToggle(String param) {
         boolean state;
-        switch (param.toLowerCase()) {
-            case "auto":
-                state = RequeueMod.instance.toggleAuto();
-                ChatUtil.displayMessageWithColor("Toggled auto to " + state + ".");
-                break;
-            case "safeguard":
-                state = RequeueMod.instance.toggleSafeGuardManual();
-                ChatUtil.displayMessageWithColor("Toggled safeguarding manual to " + state + ".");
-                break;
-            case "kickoffline":
-                state = RequeueMod.instance.toggleKickOffline();
-                ChatUtil.displayMessageWithColor("Toggled kick offline to " + state + ".");
-                break;
-            case "clientplayer":
-                state = RequeueMod.instance.toggleClientPlayer();
-                ChatUtil.displayMessageWithColor("Toggled considering the client player to " + state + ".");
-                break;
-            case "requeueonwin":
-                state = RequeueMod.instance.toggleRequeueOnWin();
-                ChatUtil.displayMessageWithColor("Toggled requeueing on win to " + state + ".");
-                break;
-            default:
-                ChatUtil.displayMessageWithColor("That action couldn't be found, sorry! <auto/safeguard/kickoffline/clientplayer/requeueonwin>");
-                return;
+        Setting setting = RequeueMod.instance.getSettingByName(param);
+        if (setting == null) {
+            ChatUtil.displayMessageWithColor("That action couldn't be found, sorry! <auto/safeguard/kickoffline/clientplayer/requeueonwin/hypixelonly>");
+            return;
         }
+        if (!(setting instanceof BooleanSetting)) {
+            ChatUtil.displayMessageWithColor("That setting cannot be toggled! <auto/safeguard/kickoffline/clientplayer/requeueonwin/hypixelonly>");
+            return;
+        }
+        BooleanSetting set = (BooleanSetting) setting;
+        set.toggle();
+        ChatUtil.displayMessageWithColor("Toggled " + set.getName() + " to " + set.isEnabled() + ".");
         new Thread(ConfigManager::saveSettings).start();
     }
     @Override
@@ -61,7 +50,7 @@ public class Requeue extends CommandBase {
             ChatUtil.displayMessageWithColor("There was an issue finding your game mode right now!");
             return;
         }
-        if ((!RequeueMod.instance.getRequeue().canRequeue()) && RequeueMod.instance.safeguardManualRequeues()) {
+        if ((!RequeueMod.instance.getRequeue().canRequeue()) && RequeueMod.instance.getSettingByName("safeguard").isEnabled()) {
             ChatUtil.displayMessageWithColor("You can't requeue now! Still people in game.");
             return;
         }

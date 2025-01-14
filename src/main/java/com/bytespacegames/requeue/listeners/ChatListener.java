@@ -63,7 +63,7 @@ public class ChatListener implements Mod.EventHandler {
         // why is this line here????
         if (Minecraft.getMinecraft().theWorld == null || Minecraft.getMinecraft().thePlayer == null) return;
 
-        if (noColors.contains("has disconnected") && RequeueMod.instance.kickOffline()) {
+        if (noColors.contains("has disconnected") && RequeueMod.instance.getSettingByName("kickoffline").isEnabled()) {
             RequeueMod.instance.getTickListener().prepareKickOffline();
         }
     }
@@ -82,11 +82,12 @@ public class ChatListener implements Mod.EventHandler {
     }
     @SubscribeEvent
     public void onChat(ClientChatReceivedEvent e) {
+        if (!RequeueMod.instance.modEnabled()) return;
         String message = e.message.getUnformattedText();
         String removedColors = ChatUtil.removeColorCodes(message).trim();
 
         // handle game ending
-        if (removedColors.equalsIgnoreCase("Reward Summary") && RequeueMod.instance.requeueOnWin()) {
+        if ((removedColors.equalsIgnoreCase("Reward Summary") || (removedColors.contains("WINNER!") && !removedColors.contains(":"))) && RequeueMod.instance.getSettingByName("requeueonwin").isEnabled()) {
             RequeueMod.instance.getTickListener().onGameEnd();
         }
         listenForParty(message);
