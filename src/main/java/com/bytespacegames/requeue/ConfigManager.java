@@ -2,6 +2,7 @@ package com.bytespacegames.requeue;
 
 
 import com.bytespacegames.requeue.settings.Setting;
+import com.sun.media.jfxmedia.logging.Logger;
 import net.minecraft.client.Minecraft;
 
 import java.io.*;
@@ -16,7 +17,6 @@ public class ConfigManager {
             }
 
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(CONFIG_FILE))) {
-                RequeueMod mod = RequeueMod.instance;
                 for (Setting setting : RequeueMod.instance.getSettings()) {
                     writer.write(setting.getName() + ":" + setting.representValue() + "\n");
                 }
@@ -42,8 +42,11 @@ public class ConfigManager {
                 String key = parts[0].trim();
                 String value = parts[1].trim();
 
-                RequeueMod mod = RequeueMod.instance;
                 Setting setting = RequeueMod.instance.getSettingByName(key);
+                if (setting == null) {
+                    Logger.logMsg(Logger.WARNING, "Configuration file is incorrect. Outdated?");
+                    continue;
+                }
                 setting.parseValue(value);
             }
         } catch (IOException e) {

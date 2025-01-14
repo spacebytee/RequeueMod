@@ -64,6 +64,7 @@ public class RequeueMod {
         this.req=rq;
     }
     public boolean modEnabled() {
+        if (Minecraft.getMinecraft().getCurrentServerData() == null || Minecraft.getMinecraft().getCurrentServerData().serverIP == null) return false;
         if (getSettingByName("hypixelonly").isEnabled()) {
             String ip = Minecraft.getMinecraft().getCurrentServerData().serverIP.toLowerCase();
             return ip.contains("hypixel.net") || ip.contains("hypixel.io");

@@ -62,18 +62,21 @@ public class TickListener implements Mod.EventHandler {
         if (LocationManager.instance.getType().equalsIgnoreCase("REPLAY")) return;
         if (LocationManager.instance.getType().equalsIgnoreCase("HOUSING")) return;
 
-        boolean useTab = LocationManager.instance.getType().equals("DUELS") || LocationManager.instance.getType().equals("PROTOTYPE");
-        if (useTab && !(RequeueMod.instance.getRequeue() instanceof TabRequeue)) {
-            RequeueMod.instance.setRequeue(new TabRequeue());
-        }
-        if (!useTab && !(RequeueMod.instance.getRequeue() instanceof WhoRequeue)) {
-            RequeueMod.instance.setRequeue(new WhoRequeue());
-        }
         // handle requeueing prompted by a game end detected in ChatListener
         if (endRequeueTriggered && endRequeueTimer.hasTimeElapsed(500,false)) {
             endRequeueTriggered = false;
             requeue();
             return;
+        }
+
+        if (LocationManager.instance.getType().equals("DUELS")) return;
+
+        boolean useTab = LocationManager.instance.getType().equals("PROTOTYPE");
+        if (useTab && !(RequeueMod.instance.getRequeue() instanceof TabRequeue)) {
+            RequeueMod.instance.setRequeue(new TabRequeue());
+        }
+        if (!useTab && !(RequeueMod.instance.getRequeue() instanceof WhoRequeue)) {
+            RequeueMod.instance.setRequeue(new WhoRequeue());
         }
         RequeueMod.instance.getRequeue().onTick();
     }
