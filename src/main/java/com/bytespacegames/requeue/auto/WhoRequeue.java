@@ -5,6 +5,7 @@ import com.bytespacegames.requeue.PartyManager;
 import com.bytespacegames.requeue.RequeueMod;
 import com.bytespacegames.requeue.util.ChatUtil;
 import com.bytespacegames.requeue.util.GameUtil;
+import com.bytespacegames.requeue.util.Timer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiDownloadTerrain;
 import net.minecraft.client.network.NetworkPlayerInfo;
@@ -13,10 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WhoRequeue implements IAutoRequeue {
-    com.bytespacegames.requeue.Utils.Timer whoTimer = new com.bytespacegames.requeue.Utils.Timer();
-    com.bytespacegames.requeue.Utils.Timer requeueTimer = new com.bytespacegames.requeue.Utils.Timer();
-    private List<String> lastTickNames = new ArrayList<String>();
-    private List<String> whoNames = new ArrayList<String>();
+    final Timer whoTimer = new Timer();
+    final Timer requeueTimer = new Timer();
+    private List<String> lastTickNames = new ArrayList<>();
+    private final List<String> whoNames = new ArrayList<>();
     public void addWhoName(String name) {
         if (name.isEmpty()) {
             return;
@@ -36,7 +37,7 @@ public class WhoRequeue implements IAutoRequeue {
     }
     boolean unhandledPlayerLeft = false;
     public void handleSendWho() {
-        List<String> names = new ArrayList<String>();
+        List<String> names = new ArrayList<>();
         for (NetworkPlayerInfo n : Minecraft.getMinecraft().getNetHandler().getPlayerInfoMap()) {
             names.add(n.getGameProfile().getName().toLowerCase().trim());
         }
@@ -50,6 +51,7 @@ public class WhoRequeue implements IAutoRequeue {
             RequeueMod.instance.getChatHandler().criteria.add("ONLINE:");
             RequeueMod.instance.getChatHandler().criteria.add("This command is not available on this server!");
             RequeueMod.instance.getChatHandler().criteria.add("Couldn't find players, sorry!");
+            RequeueMod.instance.getChatHandler().criteria.add("Command not supported!");
             unhandledPlayerLeft = false;
         }
     }
@@ -60,8 +62,7 @@ public class WhoRequeue implements IAutoRequeue {
             }
         }
         if (RequeueMod.instance.caresAboutClient()) {
-            boolean requeue = !whoNames.contains(Minecraft.getMinecraft().thePlayer.getName().trim());
-            return requeue;
+            return !whoNames.contains(Minecraft.getMinecraft().thePlayer.getName().trim());
         }
         return true;
     }
@@ -74,6 +75,7 @@ public class WhoRequeue implements IAutoRequeue {
         if (!LocationManager.instance.isLocrawValid()) return;
         if (Minecraft.getMinecraft().theWorld == null) return;
         if (Minecraft.getMinecraft().currentScreen != null && Minecraft.getMinecraft().currentScreen instanceof GuiDownloadTerrain) return;
+        if (LocationManager.instance.getType() == null) return;
         handleSendWho();
         if (whoNames.isEmpty()) return;
         if (!RequeueMod.instance.isAuto()) return;

@@ -3,11 +3,12 @@ package com.bytespacegames.requeue;
 import net.minecraft.client.Minecraft;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class PartyManager {
     public static PartyManager instance;
-    private List<String> party = new ArrayList<String>();
+    private final List<String> party = new ArrayList<>();
     public PartyManager() {
         instance = this;
     }
@@ -26,10 +27,18 @@ public class PartyManager {
         player = player.trim();
         party.add(player);
     }
-    public void removePlayer(String player) {
+    public boolean removePlayer(String player) {
         player = player.trim();
-        party.remove(player);
+        for (Iterator<String> iterator = party.iterator(); iterator.hasNext(); ) {
+            String currentPlayer = iterator.next();
+            if (currentPlayer.equalsIgnoreCase(player)) {
+                iterator.remove();
+                return true;
+            }
+        }
+        return false;
     }
+
     public boolean partyContains(String player) {
         return party.contains(player);
     }

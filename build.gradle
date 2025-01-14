@@ -7,6 +7,7 @@ buildscript {
     dependencies {
         classpath "net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT"
         classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
+        classpath 'org.json:json:20250107'
     }
 }
 
@@ -129,7 +130,7 @@ processResources {
 
 // This is the configuration for the shadow plugin, which is used to add libraries to the jar.
 shadowJar {
-    dependencies {include(dependency('org.json:json'))}
+    dependencies {}
     configurations = [project.configurations.shade] // Adds the gradle configuration "shade" so we can use it.
     duplicatesStrategy DuplicatesStrategy.EXCLUDE // Prevents duplicates
     classifier ""
@@ -169,6 +170,7 @@ sourceSets {
         ext.refMap = "mixins.requeue.refmap.json"
     }
 }
+build.dependsOn shadowJar
 
 // Task that will build the mod and put it in the "run" folder, and then run the client.
 task buildCopyToRunModsAndRun(type: Copy, dependsOn: 'build') {

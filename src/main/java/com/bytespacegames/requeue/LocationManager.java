@@ -1,6 +1,5 @@
 package com.bytespacegames.requeue;
 
-import com.bytespacegames.requeue.auto.WhoRequeue;
 import com.bytespacegames.requeue.listeners.ChatListener;
 import net.minecraft.client.Minecraft;
 import org.json.JSONObject;
@@ -8,8 +7,8 @@ import org.json.JSONObject;
 public class LocationManager {
     public static LocationManager instance;
     private String locraw = null;
-    private Minecraft mc;
-    private ChatListener chatHandler;
+    private final Minecraft mc;
+    private final ChatListener chatHandler;
     private boolean awaitingLocraw = true;
     public void invalidateLocraw() {
         locraw = null;
@@ -22,10 +21,12 @@ public class LocationManager {
     public void setLocraw(String message) {
         locraw = message;
     }
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isLocrawValid() {
         return locraw != null;
     }
     public void sendLocraw() {
+
         mc.thePlayer.sendChatMessage("/locraw");
         awaitingLocraw = false;
         chatHandler.criteria.clear();
@@ -40,12 +41,16 @@ public class LocationManager {
         if (locraw == null) return null;
         JSONObject obj = new JSONObject(locraw);
         if (!obj.has("gametype")) return null;
-        return obj.getString("gametype").toString();
+        return obj.getString("gametype").trim();
     }
     public String getMode() {
         if (locraw == null) return null;
         JSONObject obj = new JSONObject(locraw);
         if (!obj.has("mode")) return null;
-        return obj.getString("mode").toString();
+        return obj.getString("mode");
+    }
+
+    public String getLocraw() {
+        return locraw;
     }
 }

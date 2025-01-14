@@ -5,6 +5,7 @@ import com.bytespacegames.requeue.PartyManager;
 import com.bytespacegames.requeue.RequeueMod;
 import com.bytespacegames.requeue.auto.WhoRequeue;
 import com.bytespacegames.requeue.util.ChatUtil;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -14,8 +15,9 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("ClassExplicitlyAnnotation")
 public class ChatListener implements Mod.EventHandler {
-    public List<String> criteria = new ArrayList<String>();
+    public final List<String> criteria = new ArrayList<>();
     public long waitingSince = Long.MAX_VALUE;
     public void timeCriteria() {
         waitingSince = System.currentTimeMillis();
@@ -35,15 +37,34 @@ public class ChatListener implements Mod.EventHandler {
             return;
         }
         if (noColors.contains("has left the party")) {
-            String player = noColors.split(" ")[3];
-            if (player.contains("[")) player = noColors.split(" ")[4];
+            String player = noColors.split(" ")[0];
+            if (player.contains("[")) player = noColors.split(" ")[1];
             PartyManager.instance.removePlayer(player);
             return;
         }
-        if (noColors.contains("has joined the party")) {
-            String player = noColors.split(" ")[3];
-            if (player.contains("[")) player = noColors.split(" ")[4];
+        if (noColors.contains("has been removed from the party.")) {
+            String player = noColors.split(" ")[0];
+            if (player.contains("[")) player = noColors.split(" ")[1];
+            PartyManager.instance.removePlayer(player);
+            return;
+        }
+        if (noColors.contains("joined the party")) {
+            String player = noColors.split(" ")[0];
+            if (player.contains("[")) player = noColors.split(" ")[1];
+            PartyManager.instance.removePlayer(player);
+            return;
+        }
+        if (noColors.startsWith("Kicked") && noColors.endsWith("because they were offline.")) {
+            String player = noColors.split(" ")[1];
+            if (player.contains("[")) player = noColors.split(" ")[2];
             PartyManager.instance.registerPlayer(player);
+            return;
+        }
+        // why is this line here????
+        if (Minecraft.getMinecraft().theWorld == null || Minecraft.getMinecraft().thePlayer == null) return;
+
+        if (noColors.contains("has disconnected") && RequeueMod.instance.kickOffline()) {
+            RequeueMod.instance.getTickListener().prepareKickOffline();
         }
     }
     public void listenForParty(String msg) {
@@ -61,13 +82,19 @@ public class ChatListener implements Mod.EventHandler {
     }
     @SubscribeEvent
     public void onChat(ClientChatReceivedEvent e) {
-        listenForParty(e.message.getUnformattedText());
-
         String message = e.message.getUnformattedText();
+        String removedColors = ChatUtil.removeColorCodes(message).trim();
+
+        // handle game ending
+        if (removedColors.equalsIgnoreCase("Reward Summary") && RequeueMod.instance.requeueOnWin()) {
+            RequeueMod.instance.getTickListener().onGameEnd();
+        }
+        listenForParty(message);
+        // handle locraw responses
         if (message.startsWith("{\"server\":")) {
             LocationManager.instance.setLocraw(message);
         }
-        String removedColors = ChatUtil.removeColorCodes(message).trim();
+        // handle WHO parsing
         if (removedColors.startsWith("ONLINE:") && RequeueMod.instance.getRequeue() instanceof WhoRequeue) {
             String[] playerList = removedColors.split(":",2)[1].split(",");
             ((WhoRequeue)RequeueMod.instance.getRequeue()).clearWhoNames();
@@ -75,13 +102,12 @@ public class ChatListener implements Mod.EventHandler {
                 ((WhoRequeue)RequeueMod.instance.getRequeue()).addWhoName(p.trim());
             }
         }
-
+        // handle hiding the message if prepared for
         if (criteria.isEmpty()) return;
         boolean blocked = false;
         for (String s : criteria) {
             if (removedColors.contains(s)) {
-                //e.setCanceled(true);
-                ChatUtil.displayMessageWithColor("would've hidden message but did not");
+                e.setCanceled(true);
                 blocked = true;
                 break;
             }

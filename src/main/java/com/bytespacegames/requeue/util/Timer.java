@@ -1,4 +1,4 @@
-package com.bytespacegames.requeue.Utils;
+package com.bytespacegames.requeue.util;
 
 public class Timer {
     private long lastMS = System.currentTimeMillis();

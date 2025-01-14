@@ -6,9 +6,10 @@ public class GameUtil {
         if ("normal".equals(mode) && !"GINGERBREAD".equals(type) && !"MCGO".equals(type))
             return type;
 
+        //MURDER_MYSTERY, BEDWARS, DUELS all return mode. cases merged with default
         switch (type) {
-            case "MURDER_MYSTERY": return mode;
             case "SKYBLOCK": return "skyblock";
+            case "PIT": return "pit";
             case "TNTGAMES": return "tnt_" + mode;
             case "SPEED_UHC": return "speed_" + mode;
             case "UHC": return "uhc_" + mode;
@@ -23,23 +24,19 @@ public class GameUtil {
             case "SUPER_SMASH": return "super_smash_" + mode;
             case "WOOL_GAMES": return "wool_" + mode;
             case "ARCADE":
-                if ("DEFENDER".equals(mode)) {
-                    return "arcade_creeper_defense";
-                } else if ("FARM_HUNT".equals(mode)) {
-                    return "arcade_" + mode;
-                } else if ("PARTY".equals(mode)) {
-                    return "arcade_party_games_1";
+                switch (mode) {
+                    case "ENDER": return "arcade_" + "ender_spleef";
+                    case "DRAGONWARS2": return "arcade_" + "dragon_wars";
+                    case "DRAW_THEIR_THING": return "arcade_" + "pixel_painters";
+                    case "ONEINTHEQUIVER": return "arcade_" + "bounty_hunters";
+                    case "DAYONE": return "arcade_" + "day_one";
+                    case "PARTY": return "arcade_" + "party_games_1";
+                    case "FARM_HUNT": return "arcade_" + mode;
+                    case "DEFENDER": return "arcade_" + "creeper_defense";
                 }
-                if ("ENDER".equals(mode)) return "arcade_" + "ender_spleef";
-                if ("DRAGONWARS2".equals(mode)) return "arcade_" + "dragon_wars";
-                if ("DRAW_THEIR_THING".equals(mode)) return "arcade_" + "pixel_painters";
-                if ("ONEINTHEQUIVER".equals(mode)) return "arcade_" + "bounty_hunters";
-                if ("DAYONE".equals(mode)) return "arcade_" + "day_one";
-                if ("PARTY".equals(mode)) return "arcade_" + "party_games_1";
-                if ("DEFENDER".equals(mode)) return "arcade_" + "creeper_defense";
                 return "arcade_" + mode; // Default fallback for arcade modes
             default:
-                return null;
+                return mode;
         }
     }
 }
