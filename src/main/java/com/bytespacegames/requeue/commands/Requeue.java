@@ -46,9 +46,9 @@ public class Requeue extends CommandBase {
                 break;
             default:
                 ChatUtil.displayMessageWithColor("That action couldn't be found, sorry! <auto/safeguard/kickoffline/clientplayer/requeueonwin>");
-                break;
+                return;
         }
-        ConfigManager.saveSettings();
+        new Thread(ConfigManager::saveSettings).start();
     }
     @Override
     public void processCommand(ICommandSender iCommandSender, String[] args) {
