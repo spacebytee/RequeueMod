@@ -59,6 +59,7 @@ public class RequeuePartyList extends CommandBase {
         }
         if (args[0].equalsIgnoreCase("clear")) {
             PartyManager.instance.clearParty();
+            ChatUtil.displayMessageWithColor("Cleared the party.");
             return;
         }
         if (!args[0].equalsIgnoreCase("add") && !args[0].equalsIgnoreCase("remove")) {
