@@ -96,6 +96,7 @@ public class TickListener implements Mod.EventHandler {
         returnedLastTick = false;
     }
     public void onGameEnd() {
+        endRequeueTriggered = true;
         endRequeueTimer.reset();
     }
     public Class<? extends Annotation> annotationType() { return null; }

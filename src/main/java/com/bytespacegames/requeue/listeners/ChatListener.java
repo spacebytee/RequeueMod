@@ -51,7 +51,7 @@ public class ChatListener implements Mod.EventHandler {
         if (noColors.contains("joined the party")) {
             String player = noColors.split(" ")[0];
             if (player.contains("[")) player = noColors.split(" ")[1];
-            PartyManager.instance.removePlayer(player);
+            PartyManager.instance.registerPlayer(player);
             return;
         }
         if (noColors.startsWith("Kicked") && noColors.endsWith("because they were offline.")) {
@@ -60,9 +60,8 @@ public class ChatListener implements Mod.EventHandler {
             PartyManager.instance.registerPlayer(player);
             return;
         }
-        // why is this line here????
-        if (Minecraft.getMinecraft().theWorld == null || Minecraft.getMinecraft().thePlayer == null) return;
 
+        if (Minecraft.getMinecraft().theWorld == null || Minecraft.getMinecraft().thePlayer == null) return;
         if (noColors.contains("has disconnected") && RequeueMod.instance.getSettingByName("kickoffline").isEnabled()) {
             RequeueMod.instance.getTickListener().prepareKickOffline();
         }
@@ -87,7 +86,7 @@ public class ChatListener implements Mod.EventHandler {
         String removedColors = ChatUtil.removeColorCodes(message).trim();
 
         // handle game ending
-        if (((removedColors.contains("Reward Summary") || (removedColors.contains("WINNER!")) && !removedColors.contains(":"))) && RequeueMod.instance.getSettingByName("requeueonwin").isEnabled()) {
+        if (((removedColors.contains("Reward Summary") || removedColors.contains("WINNER!")) && !removedColors.contains(":")) && RequeueMod.instance.getSettingByName("requeueonwin").isEnabled()) {
             RequeueMod.instance.getTickListener().onGameEnd();
         }
         listenForParty(message);

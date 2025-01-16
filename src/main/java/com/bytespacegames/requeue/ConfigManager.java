@@ -2,7 +2,6 @@ package com.bytespacegames.requeue;
 
 
 import com.bytespacegames.requeue.settings.Setting;
-import com.sun.media.jfxmedia.logging.Logger;
 import net.minecraft.client.Minecraft;
 
 import java.io.*;
@@ -44,7 +43,7 @@ public class ConfigManager {
 
                 Setting setting = RequeueMod.instance.getSettingByName(key);
                 if (setting == null) {
-                    Logger.logMsg(Logger.WARNING, "Configuration file is incorrect. Outdated?");
+                    //Logger.logMsg(Logger.WARNING, "Configuration file is incorrect. Outdated?");
                     continue;
                 }
                 setting.parseValue(value);
