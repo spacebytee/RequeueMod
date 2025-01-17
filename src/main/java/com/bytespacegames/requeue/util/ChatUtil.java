@@ -15,7 +15,7 @@ public class ChatUtil {
             return;
         }
         for (String msg : messages) {
-            Minecraft.getMinecraft().thePlayer.addChatComponentMessage(new ChatComponentText(RequeueMod.MOD_PREFIX + " §e> " + msg));
+            Minecraft.getMinecraft().thePlayer.addChatComponentMessage(new ChatComponentText(RequeueMod.PRIMARY_COLOR + RequeueMod.MOD_PREFIX + " " + RequeueMod.TEXT_COLOR + "> " + msg));
         }
         messages.clear();
     }

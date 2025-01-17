@@ -6,6 +6,7 @@ import com.bytespacegames.requeue.commands.Requeue;
 import com.bytespacegames.requeue.commands.RequeuePartyList;
 import com.bytespacegames.requeue.listeners.ChatListener;
 import com.bytespacegames.requeue.listeners.TickListener;
+import com.bytespacegames.requeue.listeners.WorldListener;
 import com.bytespacegames.requeue.settings.BooleanSetting;
 import com.bytespacegames.requeue.settings.Setting;
 import net.minecraft.client.Minecraft;
@@ -21,26 +22,29 @@ import java.util.List;
 public class RequeueMod {
     public static final String MODID = "requeuemod";
     public static final String VERSION = "1.0.2";
-    public static final String MOD_PREFIX = "§cspace's requeue";
+    public static final String MOD_PREFIX = "space's requeue";
+    public static final String PRIMARY_COLOR = "§c";
+    public static final String TEXT_COLOR = "§e";
     public static RequeueMod instance;
 
     private ChatListener chatHandler;
     private TickListener tickListener;
     private IAutoRequeue req = new WhoRequeue();
 
-    private List<Setting> settings = new ArrayList<Setting>();
+    private final List<Setting> settings = new ArrayList<Setting>();
 
     public List<Setting> getSettings() {
         return settings;
     }
 
     public void registerSettings() {
-        settings.add(new BooleanSetting("auto", false));
-        settings.add(new BooleanSetting("safeguard", true));
-        settings.add(new BooleanSetting("kickoffline", true));
-        settings.add(new BooleanSetting("clientplayer", true));
-        settings.add(new BooleanSetting("requeueonwin", false));
-        settings.add(new BooleanSetting("hypixelonly", true));
+        settings.add(new BooleanSetting("auto", "Automatically requeues when your party is dead.", false));
+        settings.add(new BooleanSetting("safeguard", "Prevents you from using /requeue when your party is still alive.", true));
+        settings.add(new BooleanSetting("kickoffline", "Automatically kicks offline players 5 seconds after they disconnect.", true));
+        settings.add(new BooleanSetting("clientplayer", "Considers the client player (you) when requeueing. If off, it will requeue when your party is dead, even if you're alive.", true));
+        settings.add(new BooleanSetting("requeueonwin", "Automatically requeues when the game is over.", false));
+        settings.add(new BooleanSetting("hypixelonly", "Only runs any of the mods functions when connected to a hypixel server.",true));
+        settings.add(new BooleanSetting("useforge", "Prefer forge event handlers. This can fix issues if another mod is conflicting with the mod.",false));
     }
     public Setting getSettingByName(String name) {
         for (Setting s : settings) {
@@ -79,6 +83,7 @@ public class RequeueMod {
         ConfigManager.loadSettings();
         MinecraftForge.EVENT_BUS.register(chatHandler = new ChatListener());
         MinecraftForge.EVENT_BUS.register(tickListener = new TickListener());
+        MinecraftForge.EVENT_BUS.register(new WorldListener());
         ClientCommandHandler.instance.registerCommand(new Requeue());
         ClientCommandHandler.instance.registerCommand(new RequeuePartyList());
         //ClientCommandHandler.instance.registerCommand(new LocrawDebug());

@@ -20,6 +20,7 @@ public class TickListener implements Mod.EventHandler {
     private final Timer locrawTimer = new Timer();
     private final Timer kickofflineTimer = new Timer();
     private final Timer endRequeueTimer = new Timer();
+    private final Timer endTriggerTimer = new Timer();
     private boolean endRequeueTriggered = false;
     private boolean awaitingKickOffline = false;
     private boolean returnedLastTick = false;
@@ -68,9 +69,8 @@ public class TickListener implements Mod.EventHandler {
             requeue();
             return;
         }
-
         if (LocationManager.instance.getType().equals("DUELS")) return;
-
+        // set the correct requeue method
         boolean useTab = LocationManager.instance.getType().equals("PROTOTYPE");
         if (useTab && !(RequeueMod.instance.getRequeue() instanceof TabRequeue)) {
             RequeueMod.instance.setRequeue(new TabRequeue());
@@ -96,8 +96,12 @@ public class TickListener implements Mod.EventHandler {
         returnedLastTick = false;
     }
     public void onGameEnd() {
-        endRequeueTriggered = true;
-        endRequeueTimer.reset();
+        // only trigger a game end after a delay of 5s, because sometimes seperate messages will trigger the same game to requeue twice.
+        // endTriggerTimer is solely for preventing this, endRequeueTimer is for having a slight delay after a requeue is triggered
+        if (endTriggerTimer.hasTimeElapsed(5000, true)) {
+            endRequeueTriggered = true;
+            endRequeueTimer.reset();
+        }
     }
     public Class<? extends Annotation> annotationType() { return null; }
 }

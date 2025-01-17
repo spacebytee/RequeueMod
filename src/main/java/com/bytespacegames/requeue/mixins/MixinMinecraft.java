@@ -19,6 +19,7 @@ public class MixinMinecraft {
     @Inject(method="loadWorld", at=@At("TAIL"))
     public void mixin$loadWorld(WorldClient p_71403_1_, CallbackInfo ci) {
         if (!RequeueMod.instance.modEnabled()) return;
+        if (RequeueMod.instance.getSettingByName("useforge").isEnabled()) return;
         LocationManager.instance.invalidateLocraw();
         RequeueMod.instance.getTickListener().resetTimer();
         IAutoRequeue r = RequeueMod.instance.getRequeue();

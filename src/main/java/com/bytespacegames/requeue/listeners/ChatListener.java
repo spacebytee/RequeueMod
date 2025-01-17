@@ -19,9 +19,6 @@ import java.util.List;
 public class ChatListener implements Mod.EventHandler {
     public final List<String> criteria = new ArrayList<>();
     public long waitingSince = Long.MAX_VALUE;
-    public void timeCriteria() {
-        waitingSince = System.currentTimeMillis();
-    }
     public void listenForJoins(String noColors) {
         if (noColors.contains(":")) return;
         if (noColors.startsWith("You left the party.")) {
@@ -57,7 +54,7 @@ public class ChatListener implements Mod.EventHandler {
         if (noColors.startsWith("Kicked") && noColors.endsWith("because they were offline.")) {
             String player = noColors.split(" ")[1];
             if (player.contains("[")) player = noColors.split(" ")[2];
-            PartyManager.instance.registerPlayer(player);
+            PartyManager.instance.removePlayer(player);
             return;
         }
 
@@ -69,7 +66,7 @@ public class ChatListener implements Mod.EventHandler {
     public void listenForParty(String msg) {
         String noColors = ChatUtil.removeColorCodes(msg).trim();
         listenForJoins(noColors);
-        // detect for
+        // detect
         if (!noColors.contains(":")) return;
         if (!noColors.startsWith("You'll be partying")) return;
         String secondHalf = noColors.split(":",2)[1];
@@ -114,10 +111,15 @@ public class ChatListener implements Mod.EventHandler {
         }
         if (blocked) {
             criteria.clear();
+            waitingSince = Long.MAX_VALUE;
         }
     }
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event) {
+        // clear the criteria after 5 seconds of it having items
+        if (!criteria.isEmpty() && waitingSince == Long.MAX_VALUE) {
+            waitingSince = System.currentTimeMillis();
+        }
         if (System.currentTimeMillis() - waitingSince > 5000) {
             criteria.clear();
             waitingSince = Long.MAX_VALUE;
