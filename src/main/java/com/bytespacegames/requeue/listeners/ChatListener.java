@@ -19,7 +19,6 @@ import java.util.List;
 public class ChatListener implements Mod.EventHandler {
     public final List<String> criteria = new ArrayList<>();
     private long waitingSince = Long.MAX_VALUE;
-    private boolean hideNextDead = false;
     public void listenForJoins(String noColors) {
         if (noColors.contains(":")) return;
         if (noColors.startsWith("You left the party.")) {
@@ -103,11 +102,6 @@ public class ChatListener implements Mod.EventHandler {
         if (removedColors.startsWith("ONLINE:") || removedColors.startsWith("ALIVE:") && RequeueMod.instance.getRequeue() instanceof WhoRequeue) {
             parseAsWho(removedColors);
         }
-        // handle hiding the message if prepared for
-        if (hideNextDead && removedColors.startsWith("DEAD:")) {
-            hideNextDead = false;
-            e.setCanceled(true);
-        }
         if (criteria.isEmpty()) return;
         boolean blocked = false;
         for (String s : criteria) {
@@ -122,7 +116,7 @@ public class ChatListener implements Mod.EventHandler {
             waitingSince = Long.MAX_VALUE;
 
             if (removedColors.startsWith("ALIVE:")) {
-                hideNextDead = true;
+                criteria.add("DEAD:");
             }
         }
     }
@@ -133,7 +127,6 @@ public class ChatListener implements Mod.EventHandler {
             waitingSince = System.currentTimeMillis();
         }
         if (System.currentTimeMillis() - waitingSince > 5000) {
-            hideNextDead = false;
             criteria.clear();
             waitingSince = Long.MAX_VALUE;
         }
