@@ -18,6 +18,22 @@ public class WhoRequeue implements IAutoRequeue {
     final Timer requeueTimer = new Timer();
     private List<String> lastTickNames = new ArrayList<>();
     private final List<String> whoNames = new ArrayList<>();
+    private boolean isWhoValid() {
+        // in blitz, when names are obfuscated, /who just displays the player count, but it is formatted
+        // the same as a name, so we need to handle it to make sure it doesn't just requeue
+        if (LocationManager.instance.getType().equalsIgnoreCase("SURVIVAL_GAMES")) {
+            // if there is only one player in the who-list, and it is a two-digit number, don't requeue
+            if (whoNames.size() == 1) {
+                try {
+                    int number = Integer.parseInt(whoNames.get(0));
+                    if (number <= 99) {
+                        return false;
+                    }
+                } catch (NumberFormatException ignored) {}
+            }
+        }
+        return true;
+    }
     public void addWhoName(String name) {
         if (name.isEmpty()) {
             return;
@@ -49,9 +65,11 @@ public class WhoRequeue implements IAutoRequeue {
             Minecraft.getMinecraft().thePlayer.sendChatMessage("/who");
             RequeueMod.instance.getChatHandler().criteria.clear();
             RequeueMod.instance.getChatHandler().criteria.add("ONLINE:");
+            RequeueMod.instance.getChatHandler().criteria.add("ALIVE:");
             RequeueMod.instance.getChatHandler().criteria.add("This command is not available on this server!");
             RequeueMod.instance.getChatHandler().criteria.add("Couldn't find players, sorry!");
             RequeueMod.instance.getChatHandler().criteria.add("Command not supported!");
+            RequeueMod.instance.getChatHandler().criteria.add("This command is not available while player names are scrambled!");
             unhandledPlayerLeft = false;
         }
     }
@@ -79,7 +97,7 @@ public class WhoRequeue implements IAutoRequeue {
         handleSendWho();
         if (whoNames.isEmpty()) return;
         if (!RequeueMod.instance.getSettingByName("auto").isEnabled()) return;
-        if (canRequeue() && requeueTimer.hasTimeElapsed(10000,true)) {
+        if (isWhoValid() && canRequeue() && requeueTimer.hasTimeElapsed(10000,true)) {
             String s = GameUtil.getGameID(LocationManager.instance.getType(), LocationManager.instance.getMode());
             if (s == null) {
                 ChatUtil.displayMessageWithColor("There was an issue finding your game mode right now!");
