@@ -70,6 +70,7 @@ public class WhoRequeue implements IAutoRequeue {
             RequeueMod.instance.getChatHandler().criteria.add("Couldn't find players, sorry!");
             RequeueMod.instance.getChatHandler().criteria.add("Command not supported!");
             RequeueMod.instance.getChatHandler().criteria.add("This command is not available while player names are scrambled!");
+            RequeueMod.instance.getChatHandler().criteria.add("Game hasn't started yet!");
             unhandledPlayerLeft = false;
         }
     }
