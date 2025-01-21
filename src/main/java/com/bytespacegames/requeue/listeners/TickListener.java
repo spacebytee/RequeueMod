@@ -33,6 +33,15 @@ public class TickListener implements Mod.EventHandler {
         if (!RequeueMod.instance.modEnabled()) return;
         handleKickOffline();
         handleLocraw();
+        // under these conditions, there should be no auto of any kind, the regular methods nor chat detection
+        if (LocationManager.instance == null) return;
+        if (LocationManager.instance.getType() == null) return;
+        if (LocationManager.instance.getMode() == null) return;
+        if (LocationManager.instance.getType().equalsIgnoreCase("PIT")) return;
+        if (LocationManager.instance.getType().equalsIgnoreCase("SKYBLOCK")) return;
+        if (LocationManager.instance.getType().equalsIgnoreCase("REPLAY")) return;
+        if (LocationManager.instance.getType().equalsIgnoreCase("HOUSING")) return;
+        handleWinRequeue();
         handleAuto();
     }
     public void handleKickOffline() {
@@ -54,28 +63,24 @@ public class TickListener implements Mod.EventHandler {
         RequeueMod.instance.getRequeue().requeueCleanup();
         Minecraft.getMinecraft().thePlayer.sendChatMessage("/play " + s);
     }
-    public void handleAuto() {
-        if (LocationManager.instance == null) return;
-        if (LocationManager.instance.getType() == null) return;
-        if (LocationManager.instance.getMode() == null) return;
-        if (LocationManager.instance.getType().equalsIgnoreCase("PIT")) return;
-        if (LocationManager.instance.getType().equalsIgnoreCase("SKYBLOCK")) return;
-        if (LocationManager.instance.getType().equalsIgnoreCase("REPLAY")) return;
-        if (LocationManager.instance.getType().equalsIgnoreCase("HOUSING")) return;
-
+    public void handleWinRequeue() {
         // handle requeueing prompted by a game end detected in ChatListener
         if (endRequeueTriggered && endRequeueTimer.hasTimeElapsed(500,false)) {
             endRequeueTriggered = false;
             requeue();
             return;
         }
+    }
+    public void handleAuto() {
         if (LocationManager.instance.getType().equals("DUELS")) return;
+        if (LocationManager.instance.getType().equals("ARCADE") && LocationManager.instance.getMode().equals("PARTY")) return;
+        if (LocationManager.instance.getType().equalsIgnoreCase("SKYWARS") && (LocationManager.instance.getMode().contains("teams") || LocationManager.instance.getMode().contains("mega"))) return;
         // set the correct requeue method
         boolean useTab = LocationManager.instance.getType().equals("PROTOTYPE");
         if (useTab && !(RequeueMod.instance.getRequeue() instanceof TabRequeue)) {
             RequeueMod.instance.setRequeue(new TabRequeue());
         }
-        if (!useTab && !(RequeueMod.instance.getRequeue() instanceof WhoRequeue)) {
+        if (!useTab && !(RequeueMod.instance.isUsingWhoRequeue())) {
             RequeueMod.instance.setRequeue(new WhoRequeue());
         }
         RequeueMod.instance.getRequeue().onTick();

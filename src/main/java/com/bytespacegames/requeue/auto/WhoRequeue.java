@@ -18,6 +18,10 @@ public class WhoRequeue implements IAutoRequeue {
     final Timer requeueTimer = new Timer();
     private List<String> lastTickNames = new ArrayList<>();
     private final List<String> whoNames = new ArrayList<>();
+    private boolean skywarsValid = false;
+    public void setSkywarsValid(boolean b) {
+        skywarsValid = b;
+    }
     private boolean isWhoValid() {
         // in blitz, when names are obfuscated, /who just displays the player count, but it is formatted
         // the same as a name, so we need to handle it to make sure it doesn't just requeue
@@ -31,6 +35,9 @@ public class WhoRequeue implements IAutoRequeue {
                     }
                 } catch (NumberFormatException ignored) {}
             }
+        }
+        if (LocationManager.instance.getType().equalsIgnoreCase("SKYWARS")) {
+            return skywarsValid;
         }
         return true;
     }
@@ -64,6 +71,9 @@ public class WhoRequeue implements IAutoRequeue {
         if ((canRecheckWho || unhandledPlayerLeft)  && LocationManager.instance.getMode() != null && whoTimer.hasTimeElapsed(5000, true)) {
             Minecraft.getMinecraft().thePlayer.sendChatMessage("/who");
             RequeueMod.instance.getChatHandler().criteria.clear();
+            if (LocationManager.instance.getType().equalsIgnoreCase("SKYWARS")) {
+                RequeueMod.instance.getChatHandler().criteria.add("Mode:");
+            }
             RequeueMod.instance.getChatHandler().criteria.add("ONLINE:");
             RequeueMod.instance.getChatHandler().criteria.add("ALIVE:");
             RequeueMod.instance.getChatHandler().criteria.add("This command is not available on this server!");

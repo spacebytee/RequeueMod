@@ -83,6 +83,22 @@ public class ChatListener implements Mod.EventHandler {
             ((WhoRequeue)RequeueMod.instance.getRequeue()).addWhoName(p.trim());
         }
     }
+    public void handleSkywars(String message) {
+        if (message.startsWith("Mode:")) {
+            ((WhoRequeue)RequeueMod.instance.getRequeue()).clearWhoNames();
+            criteria.add("Team #");
+            ((WhoRequeue)RequeueMod.instance.getRequeue()).setSkywarsValid(false);
+            return;
+        }
+        if (!message.startsWith("Team #")) {
+            criteria.clear();
+            ((WhoRequeue)RequeueMod.instance.getRequeue()).setSkywarsValid(true);
+            return;
+        }
+        String playerName = message.split(" ")[2];
+        ((WhoRequeue)RequeueMod.instance.getRequeue()).addWhoName(playerName);
+        criteria.add("Team #");
+    }
     @SubscribeEvent
     public void onChat(ClientChatReceivedEvent e) {
         if (!RequeueMod.instance.modEnabled()) return;
@@ -99,13 +115,20 @@ public class ChatListener implements Mod.EventHandler {
             LocationManager.instance.setLocraw(message);
         }
         // handle WHO parsing
-        if (removedColors.startsWith("ONLINE:") || removedColors.startsWith("ALIVE:") && RequeueMod.instance.getRequeue() instanceof WhoRequeue) {
+        if (RequeueMod.instance.isUsingWhoRequeue() && removedColors.startsWith("ONLINE:") || removedColors.startsWith("ALIVE:")) {
             parseAsWho(removedColors);
         }
+        hideCriteria(removedColors,e);
+        // skywars will always add another criteria, so make sure it's handled after criteria is cleared
+        if (RequeueMod.instance.isUsingWhoRequeue() && LocationManager.instance.getType().equalsIgnoreCase("SKYWARS")) {
+            handleSkywars(removedColors);
+        }
+    }
+    public void hideCriteria(String message, ClientChatReceivedEvent e) {
         if (criteria.isEmpty()) return;
         boolean blocked = false;
         for (String s : criteria) {
-            if (removedColors.contains(s)) {
+            if (message.contains(s)) {
                 e.setCanceled(true);
                 blocked = true;
                 break;
@@ -115,13 +138,18 @@ public class ChatListener implements Mod.EventHandler {
             criteria.clear();
             waitingSince = Long.MAX_VALUE;
 
-            if (removedColors.startsWith("ALIVE:")) {
+            if (message.startsWith("ALIVE:")) {
                 criteria.add("DEAD:");
             }
         }
     }
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event) {
+        if (RequeueMod.instance.isUsingWhoRequeue()) {
+            if (LocationManager.instance.getType() != null && !LocationManager.instance.getType().equalsIgnoreCase("SKYWARS"))
+                ((WhoRequeue)RequeueMod.instance.getRequeue()).setSkywarsValid(false);
+        }
+
         // clear the criteria after 5 seconds of it having items
         if (!criteria.isEmpty() && waitingSince == Long.MAX_VALUE) {
             waitingSince = System.currentTimeMillis();

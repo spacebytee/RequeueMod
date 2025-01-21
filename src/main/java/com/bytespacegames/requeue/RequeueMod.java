@@ -21,7 +21,7 @@ import java.util.List;
 @Mod(modid = RequeueMod.MODID, version = RequeueMod.VERSION)
 public class RequeueMod {
     public static final String MODID = "requeuemod";
-    public static final String VERSION = "1.0.3";
+    public static final String VERSION = "1.0.4";
     public static final String MOD_PREFIX = "space's requeue";
     public static final String PRIMARY_COLOR = "§c";
     public static final String TEXT_COLOR = "§e";
@@ -74,6 +74,12 @@ public class RequeueMod {
             return ip.contains("hypixel.net") || ip.contains("hypixel.io");
         }
         return true;
+    }
+
+    public boolean isUsingWhoRequeue() {
+        if (req == null) return false;
+        if (LocationManager.instance == null) return false;
+        return req instanceof WhoRequeue;
     }
 
     @Mod.EventHandler
