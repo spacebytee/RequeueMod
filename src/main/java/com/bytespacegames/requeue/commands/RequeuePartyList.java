@@ -71,6 +71,10 @@ public class RequeuePartyList extends CommandBase {
             return;
         }
         if (args[0].equalsIgnoreCase("add")) {
+            if (PartyManager.instance.partyContains(args[1])) {
+                ChatUtil.displayMessageWithColor("The player " + args[1] + " was already in the party.");
+                return;
+            }
             add(args[1]);
             return;
         }

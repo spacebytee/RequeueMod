@@ -24,6 +24,7 @@ public class PartyManager {
         if (player.isEmpty()) {
             return;
         }
+        if (partyContains(player)) return;
         player = player.trim();
         party.add(player);
     }

@@ -26,7 +26,6 @@ public class LocationManager {
         return locraw != null;
     }
     public void sendLocraw() {
-
         mc.thePlayer.sendChatMessage("/locraw");
         awaitingLocraw = false;
         chatHandler.criteria.clear();

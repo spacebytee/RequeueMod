@@ -103,6 +103,9 @@ public class ChatListener implements Mod.EventHandler {
     public void onChat(ClientChatReceivedEvent e) {
         if (!RequeueMod.instance.modEnabled()) return;
         String message = e.message.getUnformattedText();
+        if (message.contains(RequeueMod.PRIMARY_COLOR + RequeueMod.MOD_PREFIX)) {
+            return;
+        }
         String removedColors = ChatUtil.removeColorCodes(message).trim();
 
         // handle game ending
@@ -120,7 +123,7 @@ public class ChatListener implements Mod.EventHandler {
         }
         hideCriteria(removedColors,e);
         // skywars will always add another criteria, so make sure it's handled after criteria is cleared
-        if (RequeueMod.instance.isUsingWhoRequeue() && LocationManager.instance.getType().equalsIgnoreCase("SKYWARS")) {
+        if (RequeueMod.instance.isUsingWhoRequeue() && LocationManager.instance.getType() != null && LocationManager.instance.getType().equalsIgnoreCase("SKYWARS")) {
             handleSkywars(removedColors);
         }
     }
