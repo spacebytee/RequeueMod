@@ -54,6 +54,7 @@ public class TickListener implements Mod.EventHandler {
         locrawTimer.reset();
     }
     public void requeue() {
+        RequeueMod.instance.getRequeueTimer().reset();
         String s = GameUtil.getGameID(LocationManager.instance.getType(), LocationManager.instance.getMode());
         if (s == null) {
             ChatUtil.displayMessageWithColor("There was an issue finding your game mode right now!");
@@ -103,7 +104,7 @@ public class TickListener implements Mod.EventHandler {
     public void onGameEnd() {
         // only trigger a game end after a delay of 5s, because sometimes seperate messages will trigger the same game to requeue twice.
         // endTriggerTimer is solely for preventing this, endRequeueTimer is for having a slight delay after a requeue is triggered
-        if (endTriggerTimer.hasTimeElapsed(5000, true)) {
+        if (endTriggerTimer.hasTimeElapsed(5000, true) && RequeueMod.instance.getRequeueTimer().hasTimeElapsed(10000,false)) {
             endRequeueTriggered = true;
             endRequeueTimer.reset();
         }

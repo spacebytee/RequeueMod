@@ -5,7 +5,6 @@ import com.bytespacegames.requeue.RequeueMod;
 import com.bytespacegames.requeue.util.ChatUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 
 public class RequeuePartyList extends CommandBase {

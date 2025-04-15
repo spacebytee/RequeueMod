@@ -12,10 +12,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Minecraft.class)
 public class MixinMinecraft {
-    @Inject(method = "startGame", at = @At("HEAD"))
-    private void startGame(CallbackInfo ci) {
-        //System.out.println("Mixin worked!");
-    }
     @Inject(method="loadWorld", at=@At("TAIL"))
     public void mixin$loadWorld(WorldClient p_71403_1_, CallbackInfo ci) {
         if (!RequeueMod.instance.modEnabled()) return;

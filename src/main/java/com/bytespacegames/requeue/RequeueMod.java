@@ -9,6 +9,7 @@ import com.bytespacegames.requeue.listeners.TickListener;
 import com.bytespacegames.requeue.listeners.WorldListener;
 import com.bytespacegames.requeue.settings.BooleanSetting;
 import com.bytespacegames.requeue.settings.Setting;
+import com.bytespacegames.requeue.util.Timer;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
@@ -21,17 +22,18 @@ import java.util.List;
 @Mod(modid = RequeueMod.MODID, version = RequeueMod.VERSION)
 public class RequeueMod {
     public static final String MODID = "requeuemod";
-    public static final String VERSION = "1.0.6";
+    public static final String VERSION = "1.0.7";
     public static final String MOD_PREFIX = "space's requeue";
     public static final String PRIMARY_COLOR = "§c";
     public static final String TEXT_COLOR = "§e";
+    private final Timer requeueTimer = new Timer();
     public static RequeueMod instance;
 
     private ChatListener chatHandler;
     private TickListener tickListener;
     private IAutoRequeue req = new WhoRequeue();
 
-    private final List<Setting> settings = new ArrayList<Setting>();
+    private final List<Setting> settings = new ArrayList<>();
 
     public List<Setting> getSettings() {
         return settings;
@@ -95,5 +97,8 @@ public class RequeueMod {
         //ClientCommandHandler.instance.registerCommand(new LocrawDebug());
         new LocationManager();
         new PartyManager();
+    }
+    public Timer getRequeueTimer() {
+        return requeueTimer;
     }
 }

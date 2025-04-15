@@ -1,8 +1,8 @@
 package com.bytespacegames.requeue.settings;
 
 public abstract class Setting {
-    private String name;
-    private String description;
+    private final String name;
+    private final String description;
     public Setting(String name, String description) {
         this.name = name;
         this.description = description;

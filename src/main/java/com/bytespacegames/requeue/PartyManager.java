@@ -14,11 +14,6 @@ public class PartyManager {
     }
     public void clearParty() {
         party.clear();
-        //tryRegisterClientPlayer();
-    }
-    public void tryRegisterClientPlayer() {
-        String pName = Minecraft.getMinecraft().thePlayer.getName().trim();
-        registerPlayer(pName);
     }
     public void registerPlayer(String player) {
         if (player.isEmpty()) {

@@ -83,22 +83,6 @@ public class ChatListener implements Mod.EventHandler {
             ((WhoRequeue)RequeueMod.instance.getRequeue()).addWhoName(p.trim());
         }
     }
-    public void handleSkywars(String message) {
-        if (message.startsWith("Mode:")) {
-            ((WhoRequeue)RequeueMod.instance.getRequeue()).clearWhoNames();
-            criteria.add("Team #");
-            ((WhoRequeue)RequeueMod.instance.getRequeue()).setSkywarsValid(false);
-            return;
-        }
-        if (!message.startsWith("Team #")) {
-            criteria.clear();
-            ((WhoRequeue)RequeueMod.instance.getRequeue()).setSkywarsValid(true);
-            return;
-        }
-        String playerName = message.split(" ")[2];
-        ((WhoRequeue)RequeueMod.instance.getRequeue()).addWhoName(playerName);
-        criteria.add("Team #");
-    }
     @SubscribeEvent
     public void onChat(ClientChatReceivedEvent e) {
         if (!RequeueMod.instance.modEnabled()) return;
@@ -117,14 +101,25 @@ public class ChatListener implements Mod.EventHandler {
         if (message.startsWith("{\"server\":")) {
             LocationManager.instance.setLocraw(message);
         }
-        // handle WHO parsing
+        // standard WHO parsing
         if (RequeueMod.instance.isUsingWhoRequeue() && removedColors.startsWith("ONLINE:") || removedColors.startsWith("ALIVE:")) {
             parseAsWho(removedColors);
         }
+        // hide messages if in criteria
         hideCriteria(removedColors,e);
-        // skywars will always add another criteria, so make sure it's handled after criteria is cleared
-        if (RequeueMod.instance.isUsingWhoRequeue() && LocationManager.instance.getType() != null && LocationManager.instance.getType().equalsIgnoreCase("SKYWARS")) {
-            handleSkywars(removedColors);
+        // some games have annoying asf /who behavior, make sure they're handled after criteria is cleared
+        if (RequeueMod.instance.isUsingWhoRequeue() && LocationManager.instance.getType() != null) {
+            switch (LocationManager.instance.getType().toUpperCase()) {
+                case "SKYWARS":
+                    handleSkywars(removedColors);
+                    break;
+                case "WALLS":
+                    handleWalls(removedColors);
+                    break;
+                case "MCGO":
+                    handleCVC(removedColors);
+                    break;
+            }
         }
     }
     public void hideCriteria(String message, ClientChatReceivedEvent e) {
@@ -150,7 +145,7 @@ public class ChatListener implements Mod.EventHandler {
     public void onTick(TickEvent.ClientTickEvent event) {
         if (RequeueMod.instance.isUsingWhoRequeue()) {
             if (LocationManager.instance.getType() != null && !LocationManager.instance.getType().equalsIgnoreCase("SKYWARS"))
-                ((WhoRequeue)RequeueMod.instance.getRequeue()).setSkywarsValid(false);
+                ((WhoRequeue)RequeueMod.instance.getRequeue()).setDelayedValid(false);
         }
 
         // clear the criteria after 5 seconds of it having items
@@ -160,6 +155,73 @@ public class ChatListener implements Mod.EventHandler {
         if (System.currentTimeMillis() - waitingSince > 5000) {
             criteria.clear();
             waitingSince = Long.MAX_VALUE;
+        }
+    }
+
+    public void handleSkywars(String message) {
+        if (message.startsWith("Mode:")) {
+            ((WhoRequeue)RequeueMod.instance.getRequeue()).clearWhoNames();
+            criteria.add("Team #");
+            ((WhoRequeue)RequeueMod.instance.getRequeue()).setDelayedValid(false);
+            return;
+        }
+        if (!message.startsWith("Team #")) {
+            criteria.clear();
+            ((WhoRequeue)RequeueMod.instance.getRequeue()).setDelayedValid(true);
+            return;
+        }
+        String playerName = message.split(" ")[2];
+        ((WhoRequeue)RequeueMod.instance.getRequeue()).addWhoName(playerName);
+        criteria.add("Team #");
+    }
+    public void handleWalls(String message) {
+        if (message.startsWith("Players Alive")) {
+            ((WhoRequeue)RequeueMod.instance.getRequeue()).clearWhoNames();
+            criteria.add("RED: ");
+            ((WhoRequeue)RequeueMod.instance.getRequeue()).setDelayedValid(false);
+            return;
+        }
+        for (String color : wallsColors) {
+            if (!message.startsWith(color + ": ")) {
+                continue;
+            }
+            if (!color.equals("YELLOW")) {
+                criteria.add(getNextColor(color) + ": ");
+            }
+            String[] playerNames = message.split(": ", 2)[2].trim().split(", ");
+            for (String playerName : playerNames) {
+                ((WhoRequeue)RequeueMod.instance.getRequeue()).addWhoName(playerName.trim());
+            }
+            break;
+        }
+        if (message.startsWith("YELLOW: ")) {
+            ((WhoRequeue)RequeueMod.instance.getRequeue()).setDelayedValid(true);
+        }
+    }
+    public void handleCVC(String message) {
+        if (message.startsWith("Crims: ") || message.startsWith("Cops: ") ) {
+            if (message.startsWith("Cops: ")) {
+                ((WhoRequeue)RequeueMod.instance.getRequeue()).clearWhoNames();
+                criteria.add("Crims: ");
+                ((WhoRequeue)RequeueMod.instance.getRequeue()).setDelayedValid(false);
+                return;
+            }
+            String[] playerNames = message.split(": ", 2)[2].trim().split(", ");
+            for (String playerName : playerNames) {
+                ((WhoRequeue)RequeueMod.instance.getRequeue()).addWhoName(playerName.trim());
+            }
+        }
+        if (message.startsWith("Crims: ")) {
+            ((WhoRequeue)RequeueMod.instance.getRequeue()).setDelayedValid(true);
+        }
+    }
+    private final String[] wallsColors = {"RED", "BLUE", "GREEN", "YELLOW"};
+    public String getNextColor(String color) {
+        switch (color) {
+            case "RED": return "BLUE";
+            case "BLUE": return "GREEN";
+            case "GREEN": return "YELLOW";
+            default: return "RED";
         }
     }
 

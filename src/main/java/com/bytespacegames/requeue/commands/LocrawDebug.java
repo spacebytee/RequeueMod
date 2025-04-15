@@ -4,7 +4,6 @@ import com.bytespacegames.requeue.LocationManager;
 import com.bytespacegames.requeue.util.ChatUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 
 @SuppressWarnings("CommentedOutCode")

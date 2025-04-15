@@ -11,16 +11,20 @@ import net.minecraft.client.gui.GuiDownloadTerrain;
 import net.minecraft.client.network.NetworkPlayerInfo;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class WhoRequeue implements IAutoRequeue {
-    final Timer whoTimer = new Timer();
-    final Timer requeueTimer = new Timer();
+    private final Timer whoTimer = new Timer();
     private List<String> lastTickNames = new ArrayList<>();
     private final List<String> whoNames = new ArrayList<>();
-    private boolean skywarsValid = false;
-    public void setSkywarsValid(boolean b) {
-        skywarsValid = b;
+    private boolean delayedValid = false;
+    private final String[] exceptions = {"SKYWARS", "WALLS", "MCGO"};
+    private final String[] excludedGames = {"BEDWARS", "PAINTBALL", "QUAKECRAFT", "ARENA", "GINGERBREAD"};
+    // certain exceptions for games like skywars and walls require multiple messages to be processed
+    // this is used to ensure the who-list isn't used prematurely.
+    public void setDelayedValid(boolean b) {
+        delayedValid = b;
     }
     private boolean isWhoValid() {
         // in blitz, when names are obfuscated, /who just displays the player count, but it is formatted
@@ -36,8 +40,8 @@ public class WhoRequeue implements IAutoRequeue {
                 } catch (NumberFormatException ignored) {}
             }
         }
-        if (LocationManager.instance.getType().equalsIgnoreCase("SKYWARS")) {
-            return skywarsValid;
+        if (Arrays.asList(exceptions).contains(LocationManager.instance.getType().toUpperCase().trim())) {
+            return delayedValid;
         }
         return true;
     }
@@ -81,6 +85,12 @@ public class WhoRequeue implements IAutoRequeue {
             RequeueMod.instance.getChatHandler().criteria.add("Command not supported!");
             RequeueMod.instance.getChatHandler().criteria.add("This command is not available while player names are scrambled!");
             RequeueMod.instance.getChatHandler().criteria.add("Game hasn't started yet!");
+            RequeueMod.instance.getChatHandler().criteria.add("You cannot use that right now!");
+            RequeueMod.instance.getChatHandler().criteria.add("You cannot use this right now.");
+            RequeueMod.instance.getChatHandler().criteria.add("None!");
+            RequeueMod.instance.getChatHandler().criteria.add("Picked Teams");
+            RequeueMod.instance.getChatHandler().criteria.add("Players Alive");
+            RequeueMod.instance.getChatHandler().criteria.add("Cops:");
             unhandledPlayerLeft = false;
         }
     }
@@ -105,10 +115,11 @@ public class WhoRequeue implements IAutoRequeue {
         if (Minecraft.getMinecraft().theWorld == null) return;
         if (Minecraft.getMinecraft().currentScreen != null && Minecraft.getMinecraft().currentScreen instanceof GuiDownloadTerrain) return;
         if (LocationManager.instance.getType() == null) return;
+        if (!RequeueMod.instance.getSettingByName("auto").isEnabled()) return;
+        if (Arrays.asList(excludedGames).contains(LocationManager.instance.getType().toUpperCase().trim())) return;
         handleSendWho();
         if (whoNames.isEmpty()) return;
-        if (!RequeueMod.instance.getSettingByName("auto").isEnabled()) return;
-        if (isWhoValid() && canRequeue() && requeueTimer.hasTimeElapsed(10000,true)) {
+        if (isWhoValid() && canRequeue() && RequeueMod.instance.getRequeueTimer().hasTimeElapsed(10000,true)) {
             String s = GameUtil.getGameID(LocationManager.instance.getType(), LocationManager.instance.getMode());
             if (s == null) {
                 ChatUtil.displayMessageWithColor("There was an issue finding your game mode right now!");

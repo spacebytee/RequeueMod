@@ -9,7 +9,6 @@ import com.bytespacegames.requeue.util.ChatUtil;
 import com.bytespacegames.requeue.util.GameUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 
 public class Requeue extends CommandBase {
@@ -66,6 +65,7 @@ public class Requeue extends CommandBase {
             ChatUtil.displayMessageWithColor("You can't requeue now! Still people in game.");
             return;
         }
+        RequeueMod.instance.getRequeueTimer().reset();
         ChatUtil.displayMessageWithColor("Attempted requeue.");
         RequeueMod.instance.getRequeue().requeueCleanup();
         mc.thePlayer.sendChatMessage("/play " + s);

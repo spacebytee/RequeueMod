@@ -22,8 +22,7 @@ public class BooleanSetting extends Setting {
     public void setEnabled(boolean value) {
         this.value = value;
     }
-    public boolean toggle() {
+    public void toggle() {
         value = !value;
-        return value;
     }
 }
