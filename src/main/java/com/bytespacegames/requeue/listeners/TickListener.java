@@ -14,6 +14,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
 
 @SuppressWarnings("ALL")
 public class TickListener implements Mod.EventHandler {
@@ -35,12 +36,10 @@ public class TickListener implements Mod.EventHandler {
         handleLocraw();
         // under these conditions, there should be no auto of any kind, the regular methods nor chat detection
         if (LocationManager.instance == null) return;
-        if (LocationManager.instance.getType() == null) return;
-        if (LocationManager.instance.getMode() == null) return;
-        if (LocationManager.instance.getType().equalsIgnoreCase("PIT")) return;
-        if (LocationManager.instance.getType().equalsIgnoreCase("SKYBLOCK")) return;
-        if (LocationManager.instance.getType().equalsIgnoreCase("REPLAY")) return;
-        if (LocationManager.instance.getType().equalsIgnoreCase("HOUSING")) return;
+        if (LocationManager.instance.getType() == null) { endRequeueTriggered = false; return; }
+        if (LocationManager.instance.getMode() == null) { endRequeueTriggered = false; return; }
+        if (Arrays.asList(RequeueMod.instance.getExcludedGames()).contains(LocationManager.instance.getType().toUpperCase().trim())) return;
+
         handleWinRequeue();
         handleAuto();
     }
@@ -52,6 +51,7 @@ public class TickListener implements Mod.EventHandler {
     }
     public void resetTimer() {
         locrawTimer.reset();
+        endRequeueTriggered = false;
     }
     public void requeue() {
         RequeueMod.instance.getRequeueTimer().reset();

@@ -34,6 +34,7 @@ public class RequeueMod {
     private IAutoRequeue req = new WhoRequeue();
 
     private final List<Setting> settings = new ArrayList<>();
+    private final String[] excludedGames = {"BEDWARS", "PAINTBALL", "QUAKECRAFT", "ARENA", "GINGERBREAD", "PIT", "SKYBLOCK", "REPLAY", "HOUSING"};
 
     public List<Setting> getSettings() {
         return settings;
@@ -100,5 +101,9 @@ public class RequeueMod {
     }
     public Timer getRequeueTimer() {
         return requeueTimer;
+    }
+
+    public String[] getExcludedGames() {
+        return excludedGames;
     }
 }

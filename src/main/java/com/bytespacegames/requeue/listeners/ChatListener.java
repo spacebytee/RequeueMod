@@ -188,7 +188,7 @@ public class ChatListener implements Mod.EventHandler {
             if (!color.equals("YELLOW")) {
                 criteria.add(getNextColor(color) + ": ");
             }
-            String[] playerNames = message.split(": ", 2)[2].trim().split(", ");
+            String[] playerNames = message.split(": ", 2)[1].trim().split(", ");
             for (String playerName : playerNames) {
                 ((WhoRequeue)RequeueMod.instance.getRequeue()).addWhoName(playerName.trim());
             }
@@ -206,7 +206,7 @@ public class ChatListener implements Mod.EventHandler {
                 ((WhoRequeue)RequeueMod.instance.getRequeue()).setDelayedValid(false);
                 return;
             }
-            String[] playerNames = message.split(": ", 2)[2].trim().split(", ");
+            String[] playerNames = message.split(": ", 2)[1].trim().split(", ");
             for (String playerName : playerNames) {
                 ((WhoRequeue)RequeueMod.instance.getRequeue()).addWhoName(playerName.trim());
             }

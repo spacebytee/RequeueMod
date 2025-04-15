@@ -20,7 +20,6 @@ public class WhoRequeue implements IAutoRequeue {
     private final List<String> whoNames = new ArrayList<>();
     private boolean delayedValid = false;
     private final String[] exceptions = {"SKYWARS", "WALLS", "MCGO"};
-    private final String[] excludedGames = {"BEDWARS", "PAINTBALL", "QUAKECRAFT", "ARENA", "GINGERBREAD"};
     // certain exceptions for games like skywars and walls require multiple messages to be processed
     // this is used to ensure the who-list isn't used prematurely.
     public void setDelayedValid(boolean b) {
@@ -116,7 +115,6 @@ public class WhoRequeue implements IAutoRequeue {
         if (Minecraft.getMinecraft().currentScreen != null && Minecraft.getMinecraft().currentScreen instanceof GuiDownloadTerrain) return;
         if (LocationManager.instance.getType() == null) return;
         if (!RequeueMod.instance.getSettingByName("auto").isEnabled()) return;
-        if (Arrays.asList(excludedGames).contains(LocationManager.instance.getType().toUpperCase().trim())) return;
         handleSendWho();
         if (whoNames.isEmpty()) return;
         if (isWhoValid() && canRequeue() && RequeueMod.instance.getRequeueTimer().hasTimeElapsed(10000,true)) {
