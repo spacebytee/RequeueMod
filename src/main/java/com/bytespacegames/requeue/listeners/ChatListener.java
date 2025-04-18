@@ -93,7 +93,7 @@ public class ChatListener implements Mod.EventHandler {
         String removedColors = ChatUtil.removeColorCodes(message).trim();
 
         // handle game ending
-        if (((removedColors.contains("Reward Summary") || removedColors.contains("WINNER!")) && !removedColors.contains(":")) && RequeueMod.instance.getSettingByName("requeueonwin").isEnabled()) {
+        if (((removedColors.contains("Reward Summary") || removedColors.contains("WINNER!") || removedColors.contains("GAME WIN - ")) && !removedColors.contains(":")) && RequeueMod.instance.getSettingByName("requeueonwin").isEnabled()) {
             RequeueMod.instance.getTickListener().onGameEnd();
         }
         listenForParty(message);

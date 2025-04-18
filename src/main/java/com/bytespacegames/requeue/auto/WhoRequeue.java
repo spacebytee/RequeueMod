@@ -112,6 +112,7 @@ public class WhoRequeue implements IAutoRequeue {
     public void onTick() {
         if (!LocationManager.instance.isLocrawValid()) return;
         if (Minecraft.getMinecraft().theWorld == null) return;
+        if (Minecraft.getMinecraft().thePlayer == null) return;
         if (Minecraft.getMinecraft().currentScreen != null && Minecraft.getMinecraft().currentScreen instanceof GuiDownloadTerrain) return;
         if (LocationManager.instance.getType() == null) return;
         if (!RequeueMod.instance.getSettingByName("auto").isEnabled()) return;

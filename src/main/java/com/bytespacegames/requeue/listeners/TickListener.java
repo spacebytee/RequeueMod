@@ -44,7 +44,7 @@ public class TickListener implements Mod.EventHandler {
         handleAuto();
     }
     public void handleKickOffline() {
-        if (awaitingKickOffline && kickofflineTimer.hasTimeElapsed(5000, true)) {
+        if (awaitingKickOffline && Minecraft.getMinecraft().thePlayer != null && kickofflineTimer.hasTimeElapsed(5000, true)) {
             awaitingKickOffline = false;
             Minecraft.getMinecraft().thePlayer.sendChatMessage("/p kickoffline");
         }
@@ -66,7 +66,7 @@ public class TickListener implements Mod.EventHandler {
     }
     public void handleWinRequeue() {
         // handle requeueing prompted by a game end detected in ChatListener
-        if (endRequeueTriggered && endRequeueTimer.hasTimeElapsed(500,false)) {
+        if (Minecraft.getMinecraft().theWorld != null && endRequeueTriggered && endRequeueTimer.hasTimeElapsed(500,false)) {
             endRequeueTriggered = false;
             requeue();
             return;
