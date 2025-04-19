@@ -34,7 +34,7 @@ public class RequeueMod {
     private IAutoRequeue req = new WhoRequeue();
 
     private final List<Setting> settings = new ArrayList<>();
-    private final String[] excludedGames = {"BEDWARS", "PAINTBALL", "QUAKECRAFT", "ARENA", "GINGERBREAD", "PIT", "SKYBLOCK", "REPLAY", "HOUSING"};
+    private final String[] excludedGames = {"BEDWARS", "PAINTBALL", "QUAKECRAFT", "ARENA", "GINGERBREAD", "WALLS3", "PIT", "SKYBLOCK", "REPLAY", "HOUSING"};
 
     public List<Setting> getSettings() {
         return settings;

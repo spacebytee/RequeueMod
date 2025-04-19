@@ -26,10 +26,10 @@ public class LocationManager {
         return locraw != null;
     }
     public void sendLocraw() {
-        mc.thePlayer.sendChatMessage("/locraw");
-        awaitingLocraw = false;
         chatHandler.criteria.clear();
         chatHandler.criteria.add("{\"server\":");
+        awaitingLocraw = false;
+        mc.thePlayer.sendChatMessage("/locraw");
     }
     public LocationManager() {
         mc = Minecraft.getMinecraft();

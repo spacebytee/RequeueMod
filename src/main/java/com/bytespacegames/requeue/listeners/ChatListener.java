@@ -25,7 +25,7 @@ public class ChatListener implements Mod.EventHandler {
             PartyManager.instance.clearParty();
             return;
         }
-        if (noColors.startsWith("You have joined")) {
+        if (noColors.startsWith("You have joined") && noColors.contains("'s party")) {
             PartyManager.instance.clearParty();
             String player = noColors.split(" ")[3];
             if (player.contains("[")) player = noColors.split(" ")[4];
@@ -39,7 +39,7 @@ public class ChatListener implements Mod.EventHandler {
             PartyManager.instance.removePlayer(player);
             return;
         }
-        if (noColors.contains("has been removed from the party.")) {
+        if (noColors.contains("has been removed from the party.") || noColors.contains("was removed from your party")) {
             String player = noColors.split(" ")[0];
             if (player.contains("[")) player = noColors.split(" ")[1];
             PartyManager.instance.removePlayer(player);
@@ -52,9 +52,13 @@ public class ChatListener implements Mod.EventHandler {
             return;
         }
         if (noColors.startsWith("Kicked") && noColors.endsWith("because they were offline.")) {
-            String player = noColors.split(" ")[1];
-            if (player.contains("[")) player = noColors.split(" ")[2];
-            PartyManager.instance.removePlayer(player);
+            String[] args = noColors.split(" ");
+            for (int i = 1; i < args.length - 4; i++) {
+                String player = args[i];
+                if (player.contains("[")) continue;
+                if (player.endsWith(",")) player = player.substring(0,player.length() - 1);
+                PartyManager.instance.removePlayer(player);
+            }
             return;
         }
 
