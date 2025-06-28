@@ -1,5 +1,9 @@
 package com.bytespacegames.requeue.util;
 
+import com.bytespacegames.requeue.LocationManager;
+import com.bytespacegames.requeue.RequeueMod;
+import net.minecraft.client.Minecraft;
+
 public class GameUtil {
     public static String getGameID(String type, String mode) {
         if (mode == null) return null;
@@ -38,5 +42,20 @@ public class GameUtil {
             default:
                 return mode;
         }
+    }
+    public static void safeRequeue() {
+        String s = GameUtil.getGameID(LocationManager.instance.getType(), LocationManager.instance.getMode());
+        if (s == null) {
+            ChatUtil.displayMessageWithColor("There was an issue finding your game mode right now!");
+            return;
+        }
+        if ((!RequeueMod.instance.getRequeue().canRequeue()) && RequeueMod.instance.getSettingByName("safeguard").isEnabled()) {
+            ChatUtil.displayMessageWithColor("You can't requeue now! Still people in game.");
+            return;
+        }
+        RequeueMod.instance.getRequeueTimer().reset();
+        ChatUtil.displayMessageWithColor("Attempted requeue.");
+        RequeueMod.instance.getRequeue().requeueCleanup();
+        Minecraft.getMinecraft().thePlayer.sendChatMessage("/play " + s);
     }
 }

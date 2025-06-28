@@ -4,6 +4,7 @@ import com.bytespacegames.requeue.auto.IAutoRequeue;
 import com.bytespacegames.requeue.auto.WhoRequeue;
 import com.bytespacegames.requeue.commands.Requeue;
 import com.bytespacegames.requeue.commands.RequeuePartyList;
+import com.bytespacegames.requeue.commands.Rq;
 import com.bytespacegames.requeue.listeners.ChatListener;
 import com.bytespacegames.requeue.listeners.TickListener;
 import com.bytespacegames.requeue.listeners.WorldListener;
@@ -22,7 +23,7 @@ import java.util.List;
 @Mod(modid = RequeueMod.MODID, version = RequeueMod.VERSION)
 public class RequeueMod {
     public static final String MODID = "requeuemod";
-    public static final String VERSION = "1.0.8";
+    public static final String VERSION = "1.0.9";
     public static final String MOD_PREFIX = "space's requeue";
     public static final String PRIMARY_COLOR = "§c";
     public static final String TEXT_COLOR = "§e";
@@ -56,6 +57,13 @@ public class RequeueMod {
             }
         }
         return null;
+    }
+    public String[] settingsToArray() {
+        String[] settingNames = new String[settings.size()];
+        for (int i = 0; i < settings.size(); i++) {
+            settingNames[i] = settings.get(i).getName();
+        }
+        return settingNames;
     }
 
     public IAutoRequeue getRequeue() {
@@ -93,7 +101,12 @@ public class RequeueMod {
         MinecraftForge.EVENT_BUS.register(chatHandler = new ChatListener());
         MinecraftForge.EVENT_BUS.register(tickListener = new TickListener());
         MinecraftForge.EVENT_BUS.register(new WorldListener());
+        // remove existing requeue commands (potentially from other mods) to prevent conflicts.
+        ClientCommandHandler.instance.getCommands().remove("requeue");
+        ClientCommandHandler.instance.getCommands().remove("rq");
+
         ClientCommandHandler.instance.registerCommand(new Requeue());
+        ClientCommandHandler.instance.registerCommand(new Rq());
         ClientCommandHandler.instance.registerCommand(new RequeuePartyList());
         //ClientCommandHandler.instance.registerCommand(new LocrawDebug());
         new LocationManager();

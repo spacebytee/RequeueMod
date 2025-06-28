@@ -25,7 +25,6 @@ public class ConfigManager {
             e.printStackTrace();
         }
     }
-
     public static void loadSettings() {
         File CONFIG_FILE = new File(Minecraft.getMinecraft().mcDataDir, "config/spacerequeue.config");
         if (!CONFIG_FILE.exists()) {

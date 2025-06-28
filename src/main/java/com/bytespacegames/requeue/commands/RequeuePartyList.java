@@ -6,6 +6,10 @@ import com.bytespacegames.requeue.util.ChatUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.util.BlockPos;
+
+import java.util.Collections;
+import java.util.List;
 
 public class RequeuePartyList extends CommandBase {
     Minecraft mc = Minecraft.getMinecraft();
@@ -17,6 +21,20 @@ public class RequeuePartyList extends CommandBase {
     @Override
     public String getCommandUsage(ICommandSender iCommandSender) {
         return "/requeueparty";
+    }
+
+    @Override
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
+        if (args.length == 1) {
+            return getListOfStringsMatchingLastWord(args, "add", "remove", "list", "clear");
+        } else if (args.length == 2) {
+            if (args[0].equalsIgnoreCase("add")) {
+                return Collections.emptyList();
+            } else if (args[0].equalsIgnoreCase("remove")) {
+                return getListOfStringsMatchingLastWord(args, PartyManager.instance.getParty().toArray(new String[0]));
+            }
+        }
+        return Collections.emptyList();
     }
 
     public void list() {

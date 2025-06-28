@@ -75,7 +75,6 @@ public class TickListener implements Mod.EventHandler {
     public void handleAuto() {
         if (LocationManager.instance.getType().equals("DUELS")) return;
         if (LocationManager.instance.getType().equals("ARCADE") && LocationManager.instance.getMode().equals("PARTY")) return;
-        if (LocationManager.instance.getType().equalsIgnoreCase("SKYWARS") && (LocationManager.instance.getMode().contains("teams") || LocationManager.instance.getMode().contains("mega"))) return;
         // set the correct requeue method
         boolean useTab = LocationManager.instance.getType().equals("PROTOTYPE");
         if (useTab && !(RequeueMod.instance.getRequeue() instanceof TabRequeue)) {

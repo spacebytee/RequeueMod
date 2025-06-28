@@ -18,12 +18,15 @@ public class WhoRequeue implements IAutoRequeue {
     private final Timer whoTimer = new Timer();
     private List<String> lastTickNames = new ArrayList<>();
     private final List<String> whoNames = new ArrayList<>();
-    private boolean delayedValid = false;
+    private boolean delayedValid = false, unhandledPlayer = false;
     private final String[] exceptions = {"SKYWARS", "WALLS", "MCGO"};
     // certain exceptions for games like skywars and walls require multiple messages to be processed
     // this is used to ensure the who-list isn't used prematurely.
     public void setDelayedValid(boolean b) {
         delayedValid = b;
+    }
+    public void handlePlayer() {
+        unhandledPlayer = true;
     }
     private boolean isWhoValid() {
         // in blitz, when names are obfuscated, /who just displays the player count, but it is formatted
@@ -61,17 +64,16 @@ public class WhoRequeue implements IAutoRequeue {
         }
         return false;
     }
-    boolean unhandledPlayerLeft = false;
     public void handleSendWho() {
         List<String> names = new ArrayList<>();
         for (NetworkPlayerInfo n : Minecraft.getMinecraft().getNetHandler().getPlayerInfoMap()) {
             names.add(n.getGameProfile().getName().toLowerCase().trim());
         }
-        unhandledPlayerLeft = playerLeft(lastTickNames,names);
+        unhandledPlayer = playerLeft(lastTickNames,names) || unhandledPlayer;
         boolean canRecheckWho = whoNames.isEmpty() || playerLeft(lastTickNames,names);
         lastTickNames = names;
 
-        if ((canRecheckWho || unhandledPlayerLeft)  && LocationManager.instance.getMode() != null && whoTimer.hasTimeElapsed(5000, true)) {
+        if ((canRecheckWho || unhandledPlayer)  && LocationManager.instance.getMode() != null && whoTimer.hasTimeElapsed(5000, true)) {
             Minecraft.getMinecraft().thePlayer.sendChatMessage("/who");
             RequeueMod.instance.getChatHandler().criteria.clear();
             if (LocationManager.instance.getType().equalsIgnoreCase("SKYWARS")) {
@@ -90,7 +92,7 @@ public class WhoRequeue implements IAutoRequeue {
             RequeueMod.instance.getChatHandler().criteria.add("Picked Teams");
             RequeueMod.instance.getChatHandler().criteria.add("Players Alive");
             RequeueMod.instance.getChatHandler().criteria.add("Cops:");
-            unhandledPlayerLeft = false;
+            unhandledPlayer = false;
         }
     }
     public boolean canRequeue() {
@@ -114,8 +116,10 @@ public class WhoRequeue implements IAutoRequeue {
         if (Minecraft.getMinecraft().theWorld == null) return;
         if (Minecraft.getMinecraft().thePlayer == null) return;
         if (Minecraft.getMinecraft().currentScreen != null && Minecraft.getMinecraft().currentScreen instanceof GuiDownloadTerrain) return;
-        if (LocationManager.instance.getType() == null) return;
         if (!RequeueMod.instance.getSettingByName("auto").isEnabled()) return;
+
+        if ((LocationManager.instance.getType().equalsIgnoreCase("SKYWARS") || LocationManager.instance.getType().equalsIgnoreCase("SURVIVAL_GAMES")) && (LocationManager.instance.getMode().contains("teams") || LocationManager.instance.getMode().contains("mega"))) return;
+
         handleSendWho();
         if (whoNames.isEmpty()) return;
         if (isWhoValid() && canRequeue() && RequeueMod.instance.getRequeueTimer().hasTimeElapsed(10000,true)) {

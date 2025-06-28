@@ -105,6 +105,13 @@ public class ChatListener implements Mod.EventHandler {
         if (message.startsWith("{\"server\":")) {
             LocationManager.instance.setLocraw(message);
         }
+        // handle specific player change cases (dropper)
+        if (LocationManager.instance.isLocrawValid() && LocationManager.instance.getMode() != null && LocationManager.instance.getMode().equalsIgnoreCase("DROPPER") && RequeueMod.instance.isUsingWhoRequeue()) {
+            String[] timeArgs;
+            if (message.contains(":") && (timeArgs = message.split(":",2)).length >= 1 && timeArgs[0].contains("finished all maps")) {
+                ((WhoRequeue)RequeueMod.instance.getRequeue()).handlePlayer();
+            }
+        }
         // standard WHO parsing
         if (RequeueMod.instance.isUsingWhoRequeue() && removedColors.startsWith("ONLINE:") || removedColors.startsWith("ALIVE:")) {
             parseAsWho(removedColors);

@@ -2,6 +2,7 @@ package com.bytespacegames.requeue.commands;
 
 import com.bytespacegames.requeue.ConfigManager;
 import com.bytespacegames.requeue.LocationManager;
+import com.bytespacegames.requeue.PartyManager;
 import com.bytespacegames.requeue.RequeueMod;
 import com.bytespacegames.requeue.settings.BooleanSetting;
 import com.bytespacegames.requeue.settings.Setting;
@@ -10,6 +11,10 @@ import com.bytespacegames.requeue.util.GameUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.util.BlockPos;
+
+import java.util.Collections;
+import java.util.List;
 
 public class Requeue extends CommandBase {
     final Minecraft mc = Minecraft.getMinecraft();
@@ -17,7 +22,13 @@ public class Requeue extends CommandBase {
     public String getCommandName() {
         return "requeue";
     }
-
+    @Override
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
+        if (args.length == 1) {
+            return getListOfStringsMatchingLastWord(args, RequeueMod.instance.settingsToArray());
+        }
+        return Collections.emptyList();
+    }
     @Override
     public String getCommandUsage(ICommandSender iCommandSender) {
         return "/requeue";
@@ -56,19 +67,7 @@ public class Requeue extends CommandBase {
             handleToggle(args[0]);
             return;
         }
-        String s = GameUtil.getGameID(LocationManager.instance.getType(), LocationManager.instance.getMode());
-        if (s == null) {
-            ChatUtil.displayMessageWithColor("There was an issue finding your game mode right now!");
-            return;
-        }
-        if ((!RequeueMod.instance.getRequeue().canRequeue()) && RequeueMod.instance.getSettingByName("safeguard").isEnabled()) {
-            ChatUtil.displayMessageWithColor("You can't requeue now! Still people in game.");
-            return;
-        }
-        RequeueMod.instance.getRequeueTimer().reset();
-        ChatUtil.displayMessageWithColor("Attempted requeue.");
-        RequeueMod.instance.getRequeue().requeueCleanup();
-        mc.thePlayer.sendChatMessage("/play " + s);
+        GameUtil.safeRequeue();
     }
 
     @Override
